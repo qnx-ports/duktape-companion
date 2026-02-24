@@ -1,0 +1,58 @@
+# Alpine-Contributor: Cory Sanin <corysanin@outlook.com>
+# Alpine-Maintainer: Celeste <cielesti@protonmail.com>
+maintainer="Celeste <cielesti@protonmail.com>"
+pkgname=duktape
+pkgver=2.7.0
+pkgrel=0
+pkgdesc="Embeddable Javascript engine with a focus on portability and compact footprint"
+url="https://duktape.org"
+arch="all"
+license="MIT"
+depends="$pkgname-libs=$pkgver-r$pkgrel qnx-io-sock"
+makedepends="qnx-io-sock-dev"
+options="!check" # no tests in release archive
+subpackages="$pkgname-dbg $pkgname-dev $pkgname-doc $pkgname-libs"
+_linenoise=d895173d679be70bcd8b23041fff3e458e1a3506 # requires newer API
+source="https://duktape.org/duktape-$pkgver.tar.xz
+	https://github.com/antirez/linenoise/archive/$_linenoise/linenoise-$_linenoise.tar.gz
+	enable-linenoise.patch
+	link-shared-lib.patch
+	no-libduktaped.patch
+	"
+
+prepare() {
+	default_prepare
+
+	ln -sv "$srcdir"/linenoise-$_linenoise linenoise
+}
+
+build() {
+	make -f ./Makefile.sharedlibrary \
+		INSTALL_PREFIX=/usr
+
+	make -f ./Makefile.cmdline
+}
+
+check() {
+	make check # update if tests are added
+}
+
+package() {
+	make -f ./Makefile.sharedlibrary install \
+		INSTALL_PREFIX=/usr \
+		DESTDIR="$pkgdir"
+
+	install -Dvm755 duk -t "$pkgdir"/usr/bin/
+
+	install -Dvm644 LICENSE.txt AUTHORS.rst \
+		-t "$pkgdir"/usr/share/licenses/$pkgname/
+}
+
+
+sha512sums="
+8ff5465c9c335ea08ebb0d4a06569c991b9dc4661b63e10da6b123b882e7375e82291d6b883c2644902d68071a29ccc880dae8229447cebe710c910b54496c1d  duktape-2.7.0.tar.xz
+f8b71863f21b61fdfec8fb2ddbd6e9e26a2776842c3945affd080380c05631ce709ff1a968df7f73c70492c276a6caccfb608b54fdff0a91adb25eb3385dce50  linenoise-d895173d679be70bcd8b23041fff3e458e1a3506.tar.gz
+9a5a6057247d780b83c7552cf6b838c85cc8c58a9e8a0f2c34fb15cc1dadba063fda964d823f49ba9d342aa8c147f83a3cf70964742ea7817d2e2d044cc390cc  enable-linenoise.patch
+6ac9bb51ca1a31f1d9f32925d5c47906fb2aa64098b7417193dd4e18c0c669446fed250fe2e8262ea7546887630ba00955b68a9a6464e7972b40a858202ac911  link-shared-lib.patch
+c23a62ef0d351b4354cff34a4b17cae2ce2f7eb93e405681234c5ea2e9c4b1c7140460b9fae130faa75fd006fca3a8cd6fe783199946955c2773f883af3ec85b  no-libduktaped.patch
+"
