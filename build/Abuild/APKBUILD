@@ -3,7 +3,7 @@
 maintainer="Celeste <cielesti@protonmail.com>"
 pkgname=duktape
 pkgver=2.7.0
-pkgrel=${pkgrel:-0}
+pkgrel=0
 pkgdesc="Embeddable Javascript engine with a focus on portability and compact footprint"
 url="https://duktape.org"
 arch="all"
@@ -49,7 +49,6 @@ package() {
 }
 
 
-options="$options ${DISABLE_CHECK:+!check}"
 sha512sums="
 8ff5465c9c335ea08ebb0d4a06569c991b9dc4661b63e10da6b123b882e7375e82291d6b883c2644902d68071a29ccc880dae8229447cebe710c910b54496c1d  duktape-2.7.0.tar.xz
 f8b71863f21b61fdfec8fb2ddbd6e9e26a2776842c3945affd080380c05631ce709ff1a968df7f73c70492c276a6caccfb608b54fdff0a91adb25eb3385dce50  linenoise-d895173d679be70bcd8b23041fff3e458e1a3506.tar.gz
